@@ -1,33 +1,36 @@
+use std::env;
+
 struct TipResult {
     amt: f64,
     tip: f64,
 }
 
 fn main() {
-    let args: Vec<_> = std::env::args().collect();
+    let args: Vec<_> = env::args().skip(1).filter_map(|i| i.parse().ok()).collect();
 
     let tip = match &args[..] {
-        [_, ref amt] => get_tip(amt.parse().ok(), Some(0.15f64)),
-        [_, ref amt, ref pct] => get_tip(amt.parse().ok(), pct.parse().ok()),
+        [ref amt] => Some(get_tip(*amt, 0.15f64)),
+        [ref amt, ref pct] => Some(get_tip(*amt, *pct)),
         _ => None,
     };
 
     match tip {
-        Some(tip) => println!("${:.2} on ${:.2}", tip.tip, tip.amt),
-        None => println!("USAGE: {} AMOUNT <decimal> [TIP PERCENT] <integer>", args[0]),
+        Some(tip) => print_tip(&tip, env::args().any(|i| &i[..] == "-s")),
+        None => println!("USAGE: {} AMOUNT <decimal> [TIP PERCENT] <integer> [-s] <activate script mode>", env::args().nth(0).unwrap()),
     }
 }
 
-fn get_tip(amt: Option<f64>, pct: Option<f64>) -> Option<TipResult> {
-    if amt.is_none() || pct.is_none() {
-        return None;
+fn print_tip(tip: &TipResult, script: bool) {
+    if script {
+        println!("{}", tip.tip);
+    } else {
+        println!("${:.2} on ${:.2}", tip.tip, tip.amt);
     }
+}
 
-    let amt = amt.unwrap();
-    let pct = pct.unwrap() / 100f64;
-
-    Some(TipResult {
+fn get_tip(amt: f64, pct: f64) -> TipResult {
+    TipResult {
         amt: amt,
-        tip: amt * pct,
-    })
+        tip: amt * pct / 100f64,
+    }
 }
