@@ -9,7 +9,7 @@ fn main() {
     let args: Vec<_> = env::args().skip(1).filter_map(|i| i.parse().ok()).collect();
 
     let tip = match &args[..] {
-        [ref amt] => Some(get_tip(*amt, 0.15f64)),
+        [ref amt] => Some(get_tip(*amt, 15.0)),
         [ref amt, ref pct] => Some(get_tip(*amt, *pct)),
         _ => None,
     };
