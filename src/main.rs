@@ -31,6 +31,6 @@ fn print_tip(tip: &TipResult, script: bool) {
 fn get_tip(amt: f64, pct: f64) -> TipResult {
     TipResult {
         amt: amt,
-        tip: amt * pct / 100f64,
+        tip: amt * pct / 100.0,
     }
 }
